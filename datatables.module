@@ -212,3 +212,80 @@ function template_preprocess_views_view_datatables(&$variables) {
   $variables['view']->element['#attached']['library'][] = 'datatables/datatables_core';
   $variables['view']->element['#attached']['drupalSettings']['datatables']['#' . $variables['attributes']['id']] = $datatable_options;
 }
+
+/**
+ * Implements hook_requirements().
+ */
+function datatables_requirements($phase) {
+  $requirements = [];
+
+  if ($phase == 'runtime') {
+    $library_path = DRUPAL_ROOT . '/libraries/datatables/datatables';
+    if (!file_exists($library_path)) {
+      $requirements['datatables_assets'] = [
+        'title' => t('DataTables Assets'),
+        'value' => t('Missing assets or incompatible version'),
+        'severity' => REQUIREMENT_ERROR,
+        'description' => t('The DataTables plugin library is not installed properly. Please refer to the README file of the DataTables module for installation instructions.'),
+      ];
+      return $requirements;
+    }
+
+    // Check if the essential CSS and JavaScript files exist.
+    $essential_assets = [
+      'css' => ['jquery.dataTables.css', 'dataTables.bootstrap.css'],
+      'js' => ['jquery.dataTables.js', 'dataTables.bootstrap.js'],
+    ];
+    $missing_assets = ['css' => [], 'js' => []];
+    foreach ($essential_assets as $type => $files) {
+      foreach ($files as $file) {
+        if (!file_exists("$library_path/media/$type/$file")) {
+          $missing_assets[$type][] = $file;
+        }
+      }
+    }
+
+    // Check version compatibility
+    $plugin_version = '';
+    $version_compatible = FALSE;
+    $json_file = "$library_path/dataTables.jquery.json";
+    if (file_exists($json_file)) {
+      $json_data = file_get_contents($json_file);
+      $data = json_decode($json_data, TRUE);
+      if (isset($data['version'])) {
+        $plugin_version = $data['version'];
+        $version_compatible = version_compare($plugin_version, '1.10', '>=');
+      }
+    }
+
+    // Generate status report
+    if (empty($missing_assets['css']) && empty($missing_assets['js']) && $version_compatible) {
+      $requirements['datatables_assets'] = [
+        'title' => t('DataTables Assets'),
+        'value' => t('Missing assets or incompatible version'),
+        'severity' => REQUIREMENT_OK,
+        'description' => t('The essential DataTables CSS and JavaScript files are present and version is compatible.'),
+      ];
+    }
+    else {
+      $message = [];
+      if (!empty($missing_assets['css'])) {
+        $message[] = t('Missing CSS files: @missing_css', ['@missing_css' => implode(', ', $missing_assets['css'])]);
+      }
+      if (!empty($missing_assets['js'])) {
+        $message[] = t('Missing JS files: @missing_js', ['@missing_js' => implode(', ', $missing_assets['js'])]);
+      }
+      if (!$version_compatible) {
+        $message[] = t('Datatable plugin version is not compatible');
+      }
+
+      $requirements['datatables_assets'] = [
+        'title' => t('DataTables Assets'),
+        'value' => t('Missing assets or incompatible version'),
+        'severity' => REQUIREMENT_ERROR,
+        'description' => implode('. ', $message),
+      ];
+    }
+  }
+  return $requirements;
+}
