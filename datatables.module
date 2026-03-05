@@ -50,33 +50,23 @@ function template_preprocess_views_view_datatables(&$variables) {
     $column_options = NULL;
     // Create a second variable so we can easily find what fields we have and
     // what the CSS classes should be.
-    // This is handle by template_preprocess_views_view_table but it is being
-    // skipped for empty rows and the template still require the variable.
     $variables['fields'][$field] = Html::cleanCssIdentifier($field);
 
     if (isset($options['hidden_columns'][$field])) {
       switch ($options['hidden_columns'][$field]) {
         case 'expandable':
           $datatable_options['bExpandable'] = TRUE;
-          // ... and fall through, since expandable columns are also hidden.
         case 'hidden':
-          // Hidden or expandable columns get the bVisible init option set to
-          // false.
           $column_options['bVisible'] = FALSE;
       }
     }
 
     // Render the header labels.
     if ($field == $column && empty($fields[$field]->options['exclude'])) {
-      // Respect the "empty_column" option:
       if (!empty($options['info'][$field]) && $options['info'][$field]['empty_column'] && empty($variables['header'][$column])) {
-        // This column is empty and was already removed.
-        // Don't do anything here.
         continue;
       }
 
-      // Overrides clicksort head defined in
-      // template_preprocess_views_view_table().
       $variables['header'][$field]['content'] = !empty($fields[$field]) ? $fields[$field]->label() : '';
       unset($variables['header'][$field]['url']);
       unset($variables['header'][$field]['sort_indicator']);
@@ -84,11 +74,8 @@ function template_preprocess_views_view_datatables(&$variables) {
       if (empty($options['info'][$field]['sortable']) || !$fields[$field]->clickSortable()) {
         $column_options['bSortable'] = FALSE;
       }
-      // Only try to autodetect if there are rows.
       elseif (!empty($variables['rows'])) {
         $info = FieldStorageConfig::loadByName($fields[$field]->getEntityType(), $field);
-        // Attempt to autodetect the type of field in order to handle sorting
-        // correctly.
         if (is_object($fields[$field]->last_render)) {
           if (is_numeric($fields[$field]->last_render->__toString())) {
             $column_options['sType'] = 'numeric';
@@ -103,16 +90,13 @@ function template_preprocess_views_view_datatables(&$variables) {
         $column_options['bSortable'] = TRUE;
       }
 
-      // Add filter column setting:
       $column_options['sFilterColumnType'] = $options['filter_columns'][$field] ?? FALSE;
-      // Boolean value. FALSE only if value is set to 'thead_unsearchable'. TRUE otherwise.
       $column_options['bSearchable'] = 'thead_unsearchable' !== ($options['filter_columns'][$field] ?? '');
 
       $datatable_options['aoColumns'][] = $column_options;
       $datatable_options['aoColumnHeaders'][] = $variables['header'][$field];
     }
 
-    // Set default sort order.
     if ($options['default'] == $field) {
       $datatable_options['aaSorting'][] = [$position, $options['order']];
     }
@@ -120,7 +104,6 @@ function template_preprocess_views_view_datatables(&$variables) {
     $position++;
   }
 
-  // Enable table info display, if necessary.
   $datatable_options['bInfo'] = $options['elements']['table_info'];
   $datatable_options['bFilter'] = $options['elements']['search_box'];
   $datatable_options['bStateSave'] = $options['elements']['save_state'];
@@ -128,19 +111,17 @@ function template_preprocess_views_view_datatables(&$variables) {
   $datatable_options['bFilterColumns'] = !empty($options['filter_columns']);
   $datatable_options['bLengthChange'] = $options['pages']['length_change'];
   $datatable_options['iDisplayLength'] = (int) $options['pages']['display_length'];
-  // Enable ThemeRoller support, if necessary.
+
   if ($options['layout']['themeroller']) {
     $datatable_options['bJQueryUI'] = TRUE;
   }
 
-  // Pass the sDOM parameter, if one is specified.
   if ($options['layout']['sdom']) {
     $datatable_options['sDom'] = $options['layout']['sdom'];
   }
 
   $datatable_options['bAutoWidth'] = $options['layout']['autowidth'];
 
-  // Enable full_numbers pagination if selected.
   switch ($options['pages']['pagination_style']) {
     case 'full_numbers':
       $datatable_options['sPaginationType'] = 'full_numbers';
@@ -148,23 +129,32 @@ function template_preprocess_views_view_datatables(&$variables) {
     case 'no_pagination':
       $datatable_options['bPaginate'] = FALSE;
       break;
-
-    default:
-      // Do nothing. No parameters need to be sent for the default (two-button)
-      // style.
-      break;
   }
 
-  // Enable HTML5 Buttons plugin support (Replaces old Flash TableTools).
+  // Soporte para botones modernos HTML5 (Estilo Bootstrap 5)
   if (isset($options['elements']['table_tools']) && $options['elements']['table_tools']) {
-    // Definimos los botones que queremos mostrar:
-    $datatable_options['buttons'] = ['copy', 'csv', 'excel', 'print'];
+    $datatable_options['buttons'] = [
+        [
+            'extend' => 'copy',
+            'className' => 'btn btn-secondary btn-sm'
+        ],
+        [
+            'extend' => 'csv',
+            'className' => 'btn btn-secondary btn-sm'
+        ],
+        [
+            'extend' => 'excel',
+            'className' => 'btn btn-success btn-sm'
+        ],
+        [
+            'extend' => 'print',
+            'className' => 'btn btn-info btn-sm'
+        ]
+    ];
 
-    // En la API moderna, la letra "B" representa los botones en el sDom.
     if (!$options['layout']['sdom']) {
       $datatable_options['sDom'] = 'B<"clear">lfrtip';
     } else {
-      // Si el usuario tenía una configuración antigua con "T", la cambiamos a "B"
       $datatable_options['sDom'] = str_replace('T', 'B', $options['layout']['sdom']);
     }
 
@@ -198,14 +188,13 @@ function template_preprocess_views_view_datatables(&$variables) {
     ],
   ];
 
-  // Generate unique id.
   if (empty($variables['attributes']['id'])) {
     $variables['attributes']['id'] = Html::getUniqueId('datatable');
   }
 
-  $variables['attributes']['class'][] = 'display';
+  // CLASES MODERNAS DE BOOTSTRAP 5
+  $variables['attributes']['class'][] = 'table table-striped table-hover table-bordered table-sm';
 
-  // Add DataTables classes and data attributes.
   $variables['view']->element['#attached']['library'][] = 'datatables/datatables';
   $variables['view']->element['#attached']['library'][] = 'datatables/datatables_core';
   $variables['view']->element['#attached']['drupalSettings']['datatables']['#' . $variables['attributes']['id']] = $datatable_options;
@@ -221,7 +210,7 @@ function datatables_requirements($phase) {
       'title' => t('DataTables Assets'),
       'value' => t('Loaded via CDN (Version 2.x)'),
       'severity' => REQUIREMENT_OK,
-      'description' => t('The essential DataTables core and extension libraries are being loaded externally via official CDNs. No local libraries folder is required.'),
+      'description' => t('The essential DataTables core and extension libraries are being loaded externally via official CDNs with Bootstrap 5 support.'),
     ];
   }
   return $requirements;

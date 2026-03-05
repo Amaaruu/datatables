@@ -7,27 +7,29 @@ datatables:
     - core/once
     - core/drupalSettings
 
-# Núcleo de DataTables cargado desde CDN (Versión 2.x)
+# Núcleo de DataTables con estilos de Bootstrap 5
 datatables_core:
   version: 2.x
   js:
     https://cdn.datatables.net/2.0.3/js/dataTables.min.js: { type: external, minified: true }
+    https://cdn.datatables.net/2.0.3/js/dataTables.bootstrap5.min.js: { type: external, minified: true }
   css:
     component:
-      https://cdn.datatables.net/2.0.3/css/dataTables.dataTables.min.css: { type: external, minified: true }
+      https://cdn.datatables.net/2.0.3/css/dataTables.bootstrap5.min.css: { type: external, minified: true }
   dependencies:
     - core/jquery
 
-# Librería moderna de botones HTML5 cargada desde CDN
+# Botones de exportación con estilos de Bootstrap 5
 datatables_buttons:
   version: 3.x
   js:
     https://cdn.datatables.net/buttons/3.0.1/js/dataTables.buttons.min.js: { type: external, minified: true }
+    https://cdn.datatables.net/buttons/3.0.1/js/buttons.bootstrap5.min.js: { type: external, minified: true }
     https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js: { type: external, minified: true }
     https://cdn.datatables.net/buttons/3.0.1/js/buttons.html5.min.js: { type: external, minified: true }
     https://cdn.datatables.net/buttons/3.0.1/js/buttons.print.min.js: { type: external, minified: true }
   css:
     theme:
-      https://cdn.datatables.net/buttons/3.0.1/css/buttons.dataTables.min.css: { type: external, minified: true }
+      https://cdn.datatables.net/buttons/3.0.1/css/buttons.bootstrap5.min.css: { type: external, minified: true }
   dependencies:
     - datatables/datatables_core
