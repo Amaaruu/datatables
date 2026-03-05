@@ -11,11 +11,11 @@ use Drupal\views\Plugin\views\style\Table;
  * @ingroup views_style_plugins
  *
  * @ViewsStyle(
- *   id = "datatables",
- *   title = @Translation("DataTables"),
- *   help = @Translation("Render a table as a DataTable."),
- *   theme = "views_view_datatables",
- *   display_types = { "normal" }
+ * id = "datatables",
+ * title = @Translation("DataTables"),
+ * help = @Translation("Render a table as a DataTable."),
+ * theme = "views_view_datatables",
+ * display_types = { "normal" }
  * )
  */
 class DataTables extends Table {
@@ -123,8 +123,8 @@ class DataTables extends Table {
 
     $form['elements']['table_tools'] = [
       '#type' => 'checkbox',
-      '#title' => $this->t('Table Tools'),
-      '#description' => $this->t('Table Tools is a plugin that adds a powerful button toolbar with copy, save, and print capabilities. See <a href="http://datatables.net/extras/tabletools/">TableTools Help</a> for more information.  Note that if you have custom sDom settings, TableTools can be included by inserting the "T" character.'),
+      '#title' => $this->t('Export Buttons (Excel, CSV, Copy, Print)'),
+      '#description' => $this->t('Adds a powerful HTML5 button toolbar to export your table data. (Replaces the legacy TableTools plugin). Note that if you have custom sDom settings, Buttons can be included by inserting the "B" character.'),
       '#default_value' => $this->options['elements']['table_tools'],
     ];
 

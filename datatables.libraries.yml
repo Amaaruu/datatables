@@ -17,14 +17,16 @@ datatables_core:
   dependencies:
     - core/jquery
 
-datatables_tabletools:
-  version: 1.1.4
+# Nueva librería moderna de botones HTML5 (Reemplaza a TableTools)
+datatables_buttons:
+  version: 2.x
   js:
-    /libraries/datatables/extras/TableTools/media/js/TableTools.js: {}
-    /libraries/datatables/extras/TableTools/media/js/ZeroClipboard.js: {}
+    https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js: { type: external, minified: true }
+    https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js: { type: external, minified: true }
+    https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js: { type: external, minified: true }
+    https://cdn.datatables.net/buttons/2.4.2/js/buttons.print.min.js: { type: external, minified: true }
   css:
-    component:
-       /libraries/datatables/extras/TableTools/media/css/TableTools.css: {}
+    theme:
+      https://cdn.datatables.net/buttons/2.4.2/css/buttons.dataTables.min.css: { type: external, minified: true }
   dependencies:
-    - core/jquery
     - datatables/datatables_core

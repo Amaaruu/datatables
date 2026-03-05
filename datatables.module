@@ -155,19 +155,20 @@ function template_preprocess_views_view_datatables(&$variables) {
       break;
   }
 
-  // Enable TableTools plugin support, if necessary.
+  // Enable HTML5 Buttons plugin support (Replaces old Flash TableTools).
   if (isset($options['elements']['table_tools']) && $options['elements']['table_tools']) {
-    $datatable_options['oTableTools'] = [
-      'sSwfPath' => base_path() . 'libraries/datatables/extras/TableTools/media/swf/copy_csv_xls_pdf.swf',
-    ];
+    // Definimos los botones que queremos mostrar:
+    $datatable_options['buttons'] = ['copy', 'csv', 'excel', 'print'];
 
-    // If a custom sDom is passed, assume that "T" is added, otherwise add it
-    // manually.
+    // En la API moderna, la letra "B" representa los botones en el sDom.
     if (!$options['layout']['sdom']) {
-      $datatable_options['sDom'] = 'T<"clear">lfrtip';
+      $datatable_options['sDom'] = 'B<"clear">lfrtip';
+    } else {
+      // Si el usuario tenía una configuración antigua con "T", la cambiamos a "B"
+      $datatable_options['sDom'] = str_replace('T', 'B', $options['layout']['sdom']);
     }
 
-    $variables['view']->element['#attached']['library'][] = 'datatables/datatables_tabletools';
+    $variables['view']->element['#attached']['library'][] = 'datatables/datatables_buttons';
   }
 
   $datatable_options['oLanguage'] = [
