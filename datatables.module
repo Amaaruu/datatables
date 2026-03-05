@@ -48,12 +48,11 @@ function template_preprocess_views_view_datatables(&$variables) {
 
   foreach ($columns as $field => $column) {
     $column_options = NULL;
-
     // Create a second variable so we can easily find what fields we have and
     // what the CSS classes should be.
     // This is handle by template_preprocess_views_view_table but it is being
     // skipped for empty rows and the template still require the variable.
-    $vars['fields'][$field] = Html::cleanCssIdentifier($field);
+    $variables['fields'][$field] = Html::cleanCssIdentifier($field);
 
     if (isset($options['hidden_columns'][$field])) {
       switch ($options['hidden_columns'][$field]) {
@@ -71,7 +70,8 @@ function template_preprocess_views_view_datatables(&$variables) {
     if ($field == $column && empty($fields[$field]->options['exclude'])) {
       // Respect the "empty_column" option:
       if (!empty($options['info'][$field]) && $options['info'][$field]['empty_column'] && empty($variables['header'][$column])) {
-        // This column is empty and was already removed. Don't do anything here.
+        // This column is empty and was already removed.
+        // Don't do anything here.
         continue;
       }
 
@@ -85,9 +85,8 @@ function template_preprocess_views_view_datatables(&$variables) {
         $column_options['bSortable'] = FALSE;
       }
       // Only try to autodetect if there are rows.
-      elseif (!empty($vars['rows'])) {
+      elseif (!empty($variables['rows'])) {
         $info = FieldStorageConfig::loadByName($fields[$field]->getEntityType(), $field);
-
         // Attempt to autodetect the type of field in order to handle sorting
         // correctly.
         if (is_object($fields[$field]->last_render)) {
@@ -129,7 +128,6 @@ function template_preprocess_views_view_datatables(&$variables) {
   $datatable_options['bFilterColumns'] = !empty($options['filter_columns']);
   $datatable_options['bLengthChange'] = $options['pages']['length_change'];
   $datatable_options['iDisplayLength'] = (int) $options['pages']['display_length'];
-
   // Enable ThemeRoller support, if necessary.
   if ($options['layout']['themeroller']) {
     $datatable_options['bJQueryUI'] = TRUE;
@@ -147,7 +145,6 @@ function template_preprocess_views_view_datatables(&$variables) {
     case 'full_numbers':
       $datatable_options['sPaginationType'] = 'full_numbers';
       break;
-
     case 'no_pagination':
       $datatable_options['bPaginate'] = FALSE;
       break;
@@ -218,7 +215,6 @@ function template_preprocess_views_view_datatables(&$variables) {
  */
 function datatables_requirements($phase) {
   $requirements = [];
-
   if ($phase == 'runtime') {
     $library_path = DRUPAL_ROOT . '/libraries/datatables/datatables';
     if (!file_exists($library_path)) {
