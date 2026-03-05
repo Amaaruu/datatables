@@ -1,50 +1,25 @@
-# DataTables
+# DataTables (Drupal 11 Ready)
 
 The DataTables module integrates the DataTables jQuery plugin into Drupal which
 provides advanced interaction controls to HTML tables such as dynamic
-pagination, on-the-fly filtering, and column sorting.
-
-- For a full description of the module, visit the project page:
-   <https://www.drupal.org/project/datatables>
-- To submit bug reports and feature suggestions, or to track changes:
-   <https://www.drupal.org/project/issues/search/datatables>
-- For full documentation and examples, visit the DataTables plugin page:
-   <http://datatables.net>
-
+pagination, on-the-fly filtering, column sorting, and HTML5 Export Buttons.
 
 ## Requirements
 
-This module requires the following library (see Installation):
-- [DataTables library](https://datatables.net/download/index)
-
+This module uses official CDNs to load the DataTables 2.x library and its dependencies. 
+**No manual library downloads are required.**
 
 ## Installation
 
-- Module:
-    Install as you would normally install a contributed Drupal module.
-    See: [Installing Modules](https://www.drupal.org/docs/extending-drupal/installing-modules)
-    for further information.
-    Install with composer via `composer require 'drupal/datatables:^2.0'`,
-    then enable the module as usal.
-- Plugin:
-    Download the latest DataTables jQuery plugin version 1.10.
-    See: [DataTables library](https://datatables.net/download/index)
-    Download with Composer via `composer require 'datatables/datatables:^1.10'`
-    and move the contents of the vendor/datatables directory into the
-    libraries/datatables directory.
-    Copy to libraries from vendor with Composer:
-    Edit the `composer.json` file of your website and under the "extra" entry and
-    the "installer-paths" subentry and juste after line
-            "web/libraries/{$name}": [
-    add,
-                "datatables/datatables",
-    And install `mnsami/composer-custom-directory-installer` via
-    `composer require 'mnsami/composer-custom-directory-installer:^2.0'`
-    From now, `composer update` command will update datatables libraries.
-
+1. Install as you would normally install a contributed Drupal module.
+   See: [Installing Modules](https://www.drupal.org/docs/extending-drupal/installing-modules)
+2. Install via composer:
+   `composer require 'drupal/datatables:^2.0'`
+3. Enable the module.
 
 ## Configuration
 
 - Create a new view at Structure » Views » Add new view
 - Select DataTables as the view style.
 - Add fields to show in the table.
+- In the DataTables settings, you can enable Export Buttons (Excel, CSV, Print) which are powered by the modern DataTables Buttons extension.
