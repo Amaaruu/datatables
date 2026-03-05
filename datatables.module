@@ -27,19 +27,14 @@ function datatables_theme($existing, $type, $theme, $path) {
 
 /**
  * Display a view as a DataTables style.
- *
- * @see template_preprocess_views_view_table()
  */
 function template_preprocess_views_view_datatables(&$variables) {
-  // Ensure views.theme.inc is loaded:
   \Drupal::moduleHandler()->loadInclude('views', 'inc', 'views.theme');
   template_preprocess_views_view_table($variables);
 
   $view = $variables['view'];
-
   $options = $view->style_plugin->options;
   $handler = $view->style_plugin;
-
   $fields = &$view->field;
   $columns = $handler->sanitizeColumns($options['columns'], $fields);
 
@@ -48,8 +43,6 @@ function template_preprocess_views_view_datatables(&$variables) {
 
   foreach ($columns as $field => $column) {
     $column_options = NULL;
-    // Create a second variable so we can easily find what fields we have and
-    // what the CSS classes should be.
     $variables['fields'][$field] = Html::cleanCssIdentifier($field);
 
     if (isset($options['hidden_columns'][$field])) {
@@ -61,7 +54,6 @@ function template_preprocess_views_view_datatables(&$variables) {
       }
     }
 
-    // Render the header labels.
     if ($field == $column && empty($fields[$field]->options['exclude'])) {
       if (!empty($options['info'][$field]) && $options['info'][$field]['empty_column'] && empty($variables['header'][$column])) {
         continue;
@@ -100,7 +92,6 @@ function template_preprocess_views_view_datatables(&$variables) {
     if ($options['default'] == $field) {
       $datatable_options['aaSorting'][] = [$position, $options['order']];
     }
-
     $position++;
   }
 
@@ -131,33 +122,11 @@ function template_preprocess_views_view_datatables(&$variables) {
       break;
   }
 
-  // Soporte para botones modernos HTML5 (Estilo Bootstrap 5)
+  // Soporte para botones con estilo nativo
   if (isset($options['elements']['table_tools']) && $options['elements']['table_tools']) {
-    $datatable_options['buttons'] = [
-        [
-            'extend' => 'copy',
-            'className' => 'btn btn-secondary btn-sm'
-        ],
-        [
-            'extend' => 'csv',
-            'className' => 'btn btn-secondary btn-sm'
-        ],
-        [
-            'extend' => 'excel',
-            'className' => 'btn btn-success btn-sm'
-        ],
-        [
-            'extend' => 'print',
-            'className' => 'btn btn-info btn-sm'
-        ]
-    ];
-
-    if (!$options['layout']['sdom']) {
-      $datatable_options['sDom'] = 'B<"clear">lfrtip';
-    } else {
-      $datatable_options['sDom'] = str_replace('T', 'B', $options['layout']['sdom']);
-    }
-
+    $datatable_options['layout']['topStart'] = 'buttons';
+    $datatable_options['buttons'] = ['copy', 'csv', 'excel', 'print'];
+    
     $variables['view']->element['#attached']['library'][] = 'datatables/datatables_buttons';
   }
 
@@ -182,18 +151,14 @@ function template_preprocess_views_view_datatables(&$variables) {
       'sNext' => t('Next'),
       'sLast' => t('Last'),
     ],
-    'oAria' => [
-      'sSortAscending' => t(': activate to sort column ascending'),
-      'sSortDescending' => t(': activate to sort column descending'),
-    ],
   ];
 
   if (empty($variables['attributes']['id'])) {
     $variables['attributes']['id'] = Html::getUniqueId('datatable');
   }
 
-  // CLASES MODERNAS DE BOOTSTRAP 5
-  $variables['attributes']['class'][] = 'table table-striped table-hover table-bordered table-sm';
+  // APLICAR CLASE "display" PARA DISEÑO NATIVO
+  $variables['attributes']['class'][] = 'display stripe hover cell-border';
 
   $variables['view']->element['#attached']['library'][] = 'datatables/datatables';
   $variables['view']->element['#attached']['library'][] = 'datatables/datatables_core';
@@ -208,9 +173,9 @@ function datatables_requirements($phase) {
   if ($phase == 'runtime') {
     $requirements['datatables_assets'] = [
       'title' => t('DataTables Assets'),
-      'value' => t('Loaded via CDN (Version 2.x)'),
+      'value' => t('Loaded via CDN (Version 2.3.7)'),
       'severity' => REQUIREMENT_OK,
-      'description' => t('The essential DataTables core and extension libraries are being loaded externally via official CDNs with Bootstrap 5 support.'),
+      'description' => t('The official DataTables 2.3.7 Vanilla CSS/JS is being loaded.'),
     ];
   }
   return $requirements;
