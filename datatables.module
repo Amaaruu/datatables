@@ -40,11 +40,9 @@ function template_preprocess_views_view_datatables(&$variables) {
 
   $datatable_options['aaSorting'] = [];
   $position = 0;
-
   foreach ($columns as $field => $column) {
     $column_options = NULL;
     $variables['fields'][$field] = Html::cleanCssIdentifier($field);
-
     if (isset($options['hidden_columns'][$field])) {
       switch ($options['hidden_columns'][$field]) {
         case 'expandable':
@@ -62,7 +60,6 @@ function template_preprocess_views_view_datatables(&$variables) {
       $variables['header'][$field]['content'] = !empty($fields[$field]) ? $fields[$field]->label() : '';
       unset($variables['header'][$field]['url']);
       unset($variables['header'][$field]['sort_indicator']);
-
       if (empty($options['info'][$field]['sortable']) || !$fields[$field]->clickSortable()) {
         $column_options['bSortable'] = FALSE;
       }
@@ -84,7 +81,6 @@ function template_preprocess_views_view_datatables(&$variables) {
 
       $column_options['sFilterColumnType'] = $options['filter_columns'][$field] ?? FALSE;
       $column_options['bSearchable'] = 'thead_unsearchable' !== ($options['filter_columns'][$field] ?? '');
-
       $datatable_options['aoColumns'][] = $column_options;
       $datatable_options['aoColumnHeaders'][] = $variables['header'][$field];
     }
@@ -112,7 +108,6 @@ function template_preprocess_views_view_datatables(&$variables) {
   }
 
   $datatable_options['bAutoWidth'] = $options['layout']['autowidth'];
-
   switch ($options['pages']['pagination_style']) {
     case 'full_numbers':
       $datatable_options['sPaginationType'] = 'full_numbers';
@@ -122,10 +117,27 @@ function template_preprocess_views_view_datatables(&$variables) {
       break;
   }
 
-  // Soporte para botones con estilo nativo
+  // Soporte para botones con estilo nativo y Excel avanzado
   if (isset($options['elements']['table_tools']) && $options['elements']['table_tools']) {
     $datatable_options['layout']['topStart'] = 'buttons';
-    $datatable_options['buttons'] = ['copy', 'csv', 'excel', 'print'];
+    
+    // Configuración avanzada para ordenar el Excel
+    $datatable_options['buttons'] = [
+      'copy',
+      'csv',
+      [
+        'extend' => 'excelHtml5',
+        'text' => 'Excel',
+        'title' => 'Reporte de Datos', // Título gigante en la primera fila del Excel
+        'sheetName' => 'Datos Exportados', // Nombre de la pestaña inferior en Excel
+        'autoFilter' => TRUE, // Agrega flechas de filtrado en las cabeceras (hace que se vea como tabla)
+        'messageTop' => 'Documento exportado desde el sistema Drupal.', // Texto secundario
+        'exportOptions' => [
+          'columns' => ':visible', // Evita que se exporten columnas ocultas que rompen el orden
+        ]
+      ],
+      'print'
+    ];
     
     $variables['view']->element['#attached']['library'][] = 'datatables/datatables_buttons';
   }
@@ -152,14 +164,12 @@ function template_preprocess_views_view_datatables(&$variables) {
       'sLast' => t('Last'),
     ],
   ];
-
   if (empty($variables['attributes']['id'])) {
     $variables['attributes']['id'] = Html::getUniqueId('datatable');
   }
 
   // APLICAR CLASE "display" PARA DISEÑO NATIVO
   $variables['attributes']['class'][] = 'display stripe hover cell-border';
-
   $variables['view']->element['#attached']['library'][] = 'datatables/datatables';
   $variables['view']->element['#attached']['library'][] = 'datatables/datatables_core';
   $variables['view']->element['#attached']['drupalSettings']['datatables']['#' . $variables['attributes']['id']] = $datatable_options;
